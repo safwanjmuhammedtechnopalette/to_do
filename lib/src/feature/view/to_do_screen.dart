@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:to_do/src/feature/controller/to_do_controller.dart';
+import 'package:to_do/src/feature/data/repository/to_do_repository.dart';
 
-class ToDoScreen extends StatelessWidget {
+class ToDoScreen extends ConsumerWidget {
   const ToDoScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: Color(0XFF212121),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.green,
         child: Icon(Icons.add, color: Colors.white),
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder:
-                (context) =>
-                    AlertDialog(content: TextFormField()), // to do - customize
-          );
+        onPressed: () async {
+          await ref.read(toDoRepositoryProvider).getTodo();
         },
       ),
       body: CustomScrollView(
