@@ -32,4 +32,9 @@ class ApiService implements IApiService {
       data: data,
     );
   }
+
+  @override
+  Future<Response> put({required String path, required Object data}) async {
+    return await dio.put(path, data: data);
+  }
 }

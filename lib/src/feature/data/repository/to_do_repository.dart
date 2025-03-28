@@ -32,8 +32,32 @@ class ToDoRepository implements IToDoRepository {
   }
 
   @override
-  Future<void> addTodo() {
-    // TODO: implement addTodo
-    throw UnimplementedError();
+  Future<bool> addTodo({required String toDo}) async {
+    final Object data = {"task": toDo};
+    try {
+      final response = await _apiService.post(
+        path: Endpoint.addTodo,
+        data: data,
+      );
+      if (response.statusCode == 200) return false;
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> upDateToDo({required int id, required bool isCompleted}) async {
+    try {
+      final object = {"id": id, "isCompleted": isCompleted};
+      final response = await _apiService.put(
+        path: Endpoint.updateTodo,
+        data: object,
+      );
+      if (response.statusCode == 200) return true;
+      return false;
+    } catch (e) {
+      return false;
+    }
   }
 }

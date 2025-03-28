@@ -17,4 +17,18 @@ class ToDo extends _$ToDo {
     final todo = await ref.read(toDoRepositoryProvider).getTodo();
     return todo ?? [];
   }
+
+  Future<bool> addToDo({required String toDo}) async {
+    final isSubmitted = await ref
+        .read(toDoRepositoryProvider)
+        .addTodo(toDo: toDo);
+    return isSubmitted;
+  }
+
+  Future<bool> upDateToDo({required int id, required bool isCompleted}) async {
+    final isUpdated = await ref
+        .read(toDoRepositoryProvider)
+        .upDateToDo(id: id, isCompleted: isCompleted);
+    return isUpdated;
+  }
 }

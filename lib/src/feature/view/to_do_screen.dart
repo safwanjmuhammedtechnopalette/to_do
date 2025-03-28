@@ -7,6 +7,27 @@ import 'package:to_do/src/feature/view/widgets/app_text_field.dart';
 class ToDoScreen extends ConsumerWidget {
   const ToDoScreen({super.key});
 
+  void _saveTodo(context, WidgetRef ref, {required String toDo}) async {
+    final isAdded = await ref.read(toDoProvider.notifier).addToDo(toDo: toDo);
+    if (!isAdded) return;
+    // ignore: unused_result
+    ref.refresh(toDoProvider);
+    Navigator.pop(context);
+  }
+
+  void _onUpdate(
+    WidgetRef ref, {
+    required int? id,
+    required bool isCompleted,
+  }) async {
+    if (id == null) return;
+    final isUpdated = await ref
+        .read(toDoProvider.notifier)
+        .upDateToDo(id: id, isCompleted: isCompleted);
+    // ignore: unused_result
+    if (isUpdated) ref.refresh(toDoProvider);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncValue = ref.watch(toDoProvider);
@@ -15,9 +36,11 @@ class ToDoScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.green,
         child: Icon(Icons.add, color: Colors.white),
-        onPressed: () async {
-          _showBottomSheet(context);
-        },
+        onPressed:
+            () => _showBottomSheet(
+              context,
+              onSave: (value) => _saveTodo(context, ref, toDo: value),
+            ),
       ),
       body: CustomScrollView(
         slivers: [
@@ -45,7 +68,9 @@ class ToDoScreen extends ConsumerWidget {
                       child: _BuildTile(
                         task: toDo.task ?? '',
                         isCompleted: toDo.isCompleted ?? false,
-                        onTap: () {},
+                        tickOnTap:
+                            () =>
+                                _onUpdate(ref, id: toDo.id, isCompleted: true),
                       ),
                     );
                   },
@@ -65,7 +90,7 @@ class ToDoScreen extends ConsumerWidget {
               );
             },
             error: (error, stackTrace) {
-              return SliverToBoxAdapter(child: Text(error.toString()));
+              return SliverToBoxAdapter(child: Text('Oops!'));
             },
           ),
         ],
@@ -93,13 +118,13 @@ class BuildAppBar extends StatelessWidget {
 
 class _BuildTile extends StatelessWidget {
   const _BuildTile({
-    required this.onTap,
+    required this.tickOnTap,
     required this.task,
     this.isCompleted = false,
   });
   final bool isCompleted;
   final String task;
-  final VoidCallback onTap;
+  final VoidCallback tickOnTap;
 
   @override
   Widget build(BuildContext context) {
@@ -111,6 +136,7 @@ class _BuildTile extends StatelessWidget {
           spacing: 5,
           children: [
             GestureDetector(
+              onTap: tickOnTap,
               child: Container(
                 height: 20,
                 width: 20,
@@ -131,9 +157,7 @@ class _BuildTile extends StatelessWidget {
                         )
                         : null,
               ),
-              onTap: () {},
             ),
-
             Text(task, style: TextStyle(color: Colors.white)),
           ],
         ),
@@ -142,14 +166,17 @@ class _BuildTile extends StatelessWidget {
   }
 }
 
-_showBottomSheet(BuildContext context) {
+_showBottomSheet(
+  BuildContext context, {
+  required void Function(String) onSave,
+}) {
   String toDo = '';
   showModalBottomSheet(
     isScrollControlled: true,
     context: context,
     builder:
         (context) => BottomSheet(
-          enableDrag: true,
+          enableDrag: false,
           backgroundColor: AppColor.secondaryColor,
           onClosing: () {},
           builder: (context) {
@@ -169,19 +196,28 @@ _showBottomSheet(BuildContext context) {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              'Cancel',
-                              style: TextStyle(color: Colors.green),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(
+                                'Cancel',
+                                style: TextStyle(color: Colors.green),
+                              ),
                             ),
                             Text(
                               'New-To-Do',
                               style: TextStyle(color: Colors.white),
                             ),
-                            Text(
-                              'Save',
-                              style: TextStyle(
-                                color:
-                                    toDo.isEmpty ? Colors.grey : Colors.green,
+                            TextButton(
+                              onPressed: () => onSave(toDo),
+
+                              child: Text(
+                                'Save',
+                                style: TextStyle(
+                                  color:
+                                      toDo.trim().isEmpty
+                                          ? Colors.grey
+                                          : Colors.green,
+                                ),
                               ),
                             ),
                           ],
