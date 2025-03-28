@@ -1,45 +1,72 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:to_do/src/constant/app_color.dart';
 import 'package:to_do/src/feature/controller/to_do_controller.dart';
-import 'package:to_do/src/feature/data/repository/to_do_repository.dart';
+import 'package:to_do/src/feature/view/widgets/app_text_field.dart';
 
 class ToDoScreen extends ConsumerWidget {
   const ToDoScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final asyncValue = ref.watch(toDoProvider);
     return Scaffold(
       backgroundColor: Color(0XFF212121),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.green,
         child: Icon(Icons.add, color: Colors.white),
         onPressed: () async {
-          await ref.read(toDoRepositoryProvider).getTodo();
+          _showBottomSheet(context);
         },
       ),
       body: CustomScrollView(
         slivers: [
           BuildAppBar(),
-          SliverPadding(
-            padding: EdgeInsets.all(10),
-            sliver: SliverList.separated(
-              itemBuilder:
-                  (context, index) => Dismissible(
-                    background: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        padding: EdgeInsets.all(7),
-                        alignment: Alignment.centerRight,
-                        color: Colors.red,
-                        child: Icon(Icons.delete, color: Colors.white),
+          asyncValue.when(
+            data: (state) {
+              return SliverPadding(
+                padding: EdgeInsets.all(10),
+                sliver: SliverList.separated(
+                  itemCount: state.toDoList.length,
+                  itemBuilder: (context, index) {
+                    final toDo = state.toDoList[index];
+                    return Dismissible(
+                      key: ObjectKey(toDo.id),
+                      background: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                          padding: EdgeInsets.all(7),
+                          alignment: Alignment.centerRight,
+                          color: Colors.red,
+                          child: Icon(Icons.delete, color: Colors.white),
+                        ),
                       ),
-                    ),
-                    key: Key('key'),
-                    onDismissed: (value) {},
-                    child: _BuildTile(onTap: () {}),
+                      onDismissed: (value) {},
+                      child: _BuildTile(
+                        task: toDo.task ?? '',
+                        isCompleted: toDo.isCompleted ?? false,
+                        onTap: () {},
+                      ),
+                    );
+                  },
+                  separatorBuilder:
+                      (context, index) => const SizedBox(height: 10),
+                ),
+              );
+            },
+            loading: () {
+              return SliverToBoxAdapter(
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.green,
+                    padding: EdgeInsets.only(top: 20),
                   ),
-              separatorBuilder: (context, index) => const SizedBox(height: 10),
-            ),
+                ),
+              );
+            },
+            error: (error, stackTrace) {
+              return SliverToBoxAdapter(child: Text(error.toString()));
+            },
           ),
         ],
       ),
@@ -65,14 +92,19 @@ class BuildAppBar extends StatelessWidget {
 }
 
 class _BuildTile extends StatelessWidget {
-  const _BuildTile({super.key, required this.onTap});
-  final bool isCompleted = true;
+  const _BuildTile({
+    required this.onTap,
+    required this.task,
+    this.isCompleted = false,
+  });
+  final bool isCompleted;
+  final String task;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Color(0XFF2D2C2D),
+      color: AppColor.secondaryColor,
       child: Padding(
         padding: EdgeInsets.all(15),
         child: Row(
@@ -102,10 +134,67 @@ class _BuildTile extends StatelessWidget {
               onTap: () {},
             ),
 
-            Text('Task', style: TextStyle(color: Colors.white)),
+            Text(task, style: TextStyle(color: Colors.white)),
           ],
         ),
       ),
     );
   }
+}
+
+_showBottomSheet(BuildContext context) {
+  String toDo = '';
+  showModalBottomSheet(
+    isScrollControlled: true,
+    context: context,
+    builder:
+        (context) => BottomSheet(
+          enableDrag: true,
+          backgroundColor: AppColor.secondaryColor,
+          onClosing: () {},
+          builder: (context) {
+            return Padding(
+              padding: EdgeInsets.only(
+                top: 16,
+                left: 16,
+                right: 16,
+                bottom: MediaQuery.viewInsetsOf(context).bottom + 20,
+              ),
+              child: StatefulBuilder(
+                builder:
+                    (context, setState) => Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Cancel',
+                              style: TextStyle(color: Colors.green),
+                            ),
+                            Text(
+                              'New-To-Do',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            Text(
+                              'Save',
+                              style: TextStyle(
+                                color:
+                                    toDo.isEmpty ? Colors.grey : Colors.green,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 15),
+                        AppTextField(
+                          onChanged: (value) => setState(() => toDo = value),
+                        ),
+                      ],
+                    ),
+              ),
+            );
+          },
+        ),
+  );
 }

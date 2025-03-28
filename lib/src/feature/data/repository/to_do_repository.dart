@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:to_do/src/core/api_service/api_service.dart';
 import 'package:to_do/src/core/api_service/endpoint.dart';
 import 'package:to_do/src/core/api_service/i_api_service.dart';
+import 'package:to_do/src/feature/data/model/to_do_model.dart';
 import 'package:to_do/src/feature/data/repository/i_to_do_repository.dart';
 part 'to_do_repository.g.dart';
 
@@ -16,16 +18,17 @@ class ToDoRepository implements IToDoRepository {
   ToDoRepository(this._apiService);
   final IApiService _apiService;
 
-  final dio = Dio();
-
   @override
-  Future<void> getTodo() async {
+  Future<List<ToDoModel>?> getTodo() async {
     try {
-      final response = await dio.get("https://10.0.2.2/api/todo");
-      print('response: ${response.data}');
+      final response = await _apiService.get(path: Endpoint.getTodo);
+      if (response.statusCode != 200) return null;
+      final data = response.data as List;
+      return data.map((e) => ToDoModel.fromJson(e)).toList();
     } catch (e) {
-      print('xxxxxxxxx');
+      if (kDebugMode) print('Error: $e');
     }
+    return null;
   }
 
   @override

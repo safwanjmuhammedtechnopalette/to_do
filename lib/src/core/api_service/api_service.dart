@@ -12,9 +12,12 @@ ApiService dio(Ref ref) {
 }
 
 class ApiService implements IApiService {
-  final dio = Dio();
+  //// Dio instance
+  Dio get dio => _createDio();
 
-  // BaseOptions options = BaseOptions(baseUrl: AppConfig.baseUrl);
+  _createDio() {
+    return Dio(BaseOptions(baseUrl: AppConfig.baseUrl));
+  }
 
   @override
   Future<Response> get({required String path}) async {
@@ -23,6 +26,10 @@ class ApiService implements IApiService {
 
   @override
   Future<Response> post({required String path, required Object data}) async {
-    return dio.post(path, data: data);
+    return await dio.request(
+      path,
+      options: Options(method: 'POST'),
+      data: data,
+    );
   }
 }
