@@ -1,3 +1,3 @@
 class AppConfig {
-  static String baseUrl = "https://stork-sought-mackerel.ngrok-free.app/";
+  static String baseUrl = "https://adapted-terribly-gar.ngrok-free.app/";
 }

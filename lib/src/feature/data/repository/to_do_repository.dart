@@ -60,4 +60,16 @@ class ToDoRepository implements IToDoRepository {
       return false;
     }
   }
+
+  @override
+  Future<bool> deleteToDo({required int id}) async {
+    try {
+      final response = await _apiService.delete(path: Endpoint.deleteTodo(id));
+      print('Response: ${response.data}');
+      if (response.statusCode == 200) return true;
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
 }

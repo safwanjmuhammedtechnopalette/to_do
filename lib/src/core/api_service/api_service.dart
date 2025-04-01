@@ -37,4 +37,9 @@ class ApiService implements IApiService {
   Future<Response> put({required String path, required Object data}) async {
     return await dio.put(path, data: data);
   }
+
+  @override
+  Future<Response> delete({required String path}) async {
+    return await dio.delete(path);
+  }
 }

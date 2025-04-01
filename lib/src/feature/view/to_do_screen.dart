@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:to_do/src/constant/app_color.dart';
 import 'package:to_do/src/feature/controller/to_do_controller.dart';
 import 'package:to_do/src/feature/view/widgets/app_text_field.dart';
+import 'package:to_do/src/feature/view/widgets/confirm_sheet.dart';
 
 class ToDoScreen extends ConsumerWidget {
   const ToDoScreen({super.key});
@@ -64,7 +65,15 @@ class ToDoScreen extends ConsumerWidget {
                           child: Icon(Icons.delete, color: Colors.white),
                         ),
                       ),
-                      onDismissed: (value) {},
+                      confirmDismiss: (direction) async {
+                        final isDelete = await ConfirmSheet.show(context);
+                        return isDelete;
+                      },
+                      onDismissed: (value) async {
+                        await ref
+                            .read(toDoProvider.notifier)
+                            .deleteToDo(toDo: toDo);
+                      },
                       child: _BuildTile(
                         task: toDo.task ?? '',
                         isCompleted: toDo.isCompleted ?? false,

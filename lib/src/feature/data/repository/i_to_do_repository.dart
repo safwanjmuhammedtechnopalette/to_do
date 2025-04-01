@@ -6,4 +6,6 @@ abstract interface class IToDoRepository {
   Future<bool> addTodo({required String toDo});
 
   Future<bool> upDateToDo({required int id, required bool isCompleted});
+
+  Future<bool> deleteToDo({required int id});
 }
