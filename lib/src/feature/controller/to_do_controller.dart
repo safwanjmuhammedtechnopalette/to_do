@@ -2,11 +2,14 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:to_do/src/core/util/app_snackbar.dart';
 import 'package:to_do/src/feature/controller/to_do_state.dart';
 import 'package:to_do/src/feature/data/model/to_do_model.dart';
+import 'package:to_do/src/feature/data/repository/i_to_do_repository.dart';
 import 'package:to_do/src/feature/data/repository/to_do_repository.dart';
 part 'to_do_controller.g.dart';
 
 @Riverpod()
 class ToDo extends _$ToDo {
+  IToDoRepository get _notifier => ref.read(toDoRepositoryProvider);
+
   @override
   FutureOr<ToDoState> build() async {
     final data = await _fetchTodo();
@@ -14,7 +17,7 @@ class ToDo extends _$ToDo {
   }
 
   Future<List<ToDoModel>> _fetchTodo() async {
-    final todo = await ref.read(toDoRepositoryProvider).getTodo();
+    final todo = await _notifier.getTodo();
     return todo ?? [];
   }
 
