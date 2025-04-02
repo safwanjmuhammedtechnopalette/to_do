@@ -5,5 +5,8 @@ part 'to_do_state.freezed.dart';
 
 @freezed
 abstract class ToDoState with _$ToDoState {
-  factory ToDoState({@Default([]) List<ToDoModel> toDoList}) = _ToDoState;
+  factory ToDoState({
+    @Default([]) List<ToDoModel> toDoList,
+    @Default(false) bool isCompleted,
+  }) = _ToDoState;
 }

@@ -25,11 +25,39 @@ class ToDo extends _$ToDo {
     return isSubmitted;
   }
 
-  Future<bool> upDateToDo({required int id, required bool isCompleted}) async {
-    final isUpdated = await ref
-        .read(toDoRepositoryProvider)
-        .upDateToDo(id: id, isCompleted: isCompleted);
-    return isUpdated;
+  Future<void> updateToDo({required int id}) async {
+    // Find current item and toggle its status in UI immediately (optimistic update)
+    List<ToDoModel> updatedList = List.from(state.value?.toDoList ?? []);
+    int itemIndex = updatedList.indexWhere((item) => item.id == id);
+
+    if (itemIndex == -1) return; // Item not found
+
+    // Toggle status
+    updatedList[itemIndex].isCompleted =
+        !(updatedList[itemIndex].isCompleted ?? false);
+
+    // Update UI optimistically
+    update((state) => state.copyWith(toDoList: updatedList));
+
+    try {
+      // Call API with new status
+      bool success = await ref
+          .read(toDoRepositoryProvider)
+          .upDateToDo(
+            id: id,
+            isCompleted: updatedList[itemIndex].isCompleted ?? false,
+          );
+
+      if (!success) throw Exception('Update failed');
+    } catch (e) {
+      // Revert the change if API call fails
+      updatedList[itemIndex].isCompleted =
+          !(updatedList[itemIndex].isCompleted ?? false);
+      update((state) => state.copyWith(toDoList: updatedList));
+
+      // Show error message
+      AppSnackbar.show('Failed to update');
+    }
   }
 
   Future<void> deleteToDo({required ToDoModel toDo}) async {

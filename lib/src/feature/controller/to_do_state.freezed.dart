@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ToDoState {
 
- List<ToDoModel> get toDoList;
+ List<ToDoModel> get toDoList; bool get isCompleted;
 /// Create a copy of ToDoState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $ToDoStateCopyWith<ToDoState> get copyWith => _$ToDoStateCopyWithImpl<ToDoState>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ToDoState&&const DeepCollectionEquality().equals(other.toDoList, toDoList));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ToDoState&&const DeepCollectionEquality().equals(other.toDoList, toDoList)&&(identical(other.isCompleted, isCompleted) || other.isCompleted == isCompleted));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(toDoList));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(toDoList),isCompleted);
 
 @override
 String toString() {
-  return 'ToDoState(toDoList: $toDoList)';
+  return 'ToDoState(toDoList: $toDoList, isCompleted: $isCompleted)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $ToDoStateCopyWith<$Res>  {
   factory $ToDoStateCopyWith(ToDoState value, $Res Function(ToDoState) _then) = _$ToDoStateCopyWithImpl;
 @useResult
 $Res call({
- List<ToDoModel> toDoList
+ List<ToDoModel> toDoList, bool isCompleted
 });
 
 
@@ -63,10 +63,11 @@ class _$ToDoStateCopyWithImpl<$Res>
 
 /// Create a copy of ToDoState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? toDoList = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? toDoList = null,Object? isCompleted = null,}) {
   return _then(_self.copyWith(
 toDoList: null == toDoList ? _self.toDoList : toDoList // ignore: cast_nullable_to_non_nullable
-as List<ToDoModel>,
+as List<ToDoModel>,isCompleted: null == isCompleted ? _self.isCompleted : isCompleted // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -77,7 +78,7 @@ as List<ToDoModel>,
 
 
 class _ToDoState implements ToDoState {
-   _ToDoState({final  List<ToDoModel> toDoList = const []}): _toDoList = toDoList;
+   _ToDoState({final  List<ToDoModel> toDoList = const [], this.isCompleted = false}): _toDoList = toDoList;
   
 
  final  List<ToDoModel> _toDoList;
@@ -87,6 +88,7 @@ class _ToDoState implements ToDoState {
   return EqualUnmodifiableListView(_toDoList);
 }
 
+@override@JsonKey() final  bool isCompleted;
 
 /// Create a copy of ToDoState
 /// with the given fields replaced by the non-null parameter values.
@@ -98,16 +100,16 @@ _$ToDoStateCopyWith<_ToDoState> get copyWith => __$ToDoStateCopyWithImpl<_ToDoSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ToDoState&&const DeepCollectionEquality().equals(other._toDoList, _toDoList));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ToDoState&&const DeepCollectionEquality().equals(other._toDoList, _toDoList)&&(identical(other.isCompleted, isCompleted) || other.isCompleted == isCompleted));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_toDoList));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_toDoList),isCompleted);
 
 @override
 String toString() {
-  return 'ToDoState(toDoList: $toDoList)';
+  return 'ToDoState(toDoList: $toDoList, isCompleted: $isCompleted)';
 }
 
 
@@ -118,7 +120,7 @@ abstract mixin class _$ToDoStateCopyWith<$Res> implements $ToDoStateCopyWith<$Re
   factory _$ToDoStateCopyWith(_ToDoState value, $Res Function(_ToDoState) _then) = __$ToDoStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<ToDoModel> toDoList
+ List<ToDoModel> toDoList, bool isCompleted
 });
 
 
@@ -135,10 +137,11 @@ class __$ToDoStateCopyWithImpl<$Res>
 
 /// Create a copy of ToDoState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? toDoList = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? toDoList = null,Object? isCompleted = null,}) {
   return _then(_ToDoState(
 toDoList: null == toDoList ? _self._toDoList : toDoList // ignore: cast_nullable_to_non_nullable
-as List<ToDoModel>,
+as List<ToDoModel>,isCompleted: null == isCompleted ? _self.isCompleted : isCompleted // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
