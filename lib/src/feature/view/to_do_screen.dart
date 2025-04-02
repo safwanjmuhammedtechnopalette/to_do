@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:to_do/src/constant/app_color.dart';
 import 'package:to_do/src/feature/controller/to_do_controller.dart';
 import 'package:to_do/src/feature/view/widgets/add_bottom_sheet.dart';
@@ -94,10 +95,27 @@ class ToDoScreen extends ConsumerWidget {
               },
               loading: () {
                 return SliverToBoxAdapter(
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.green,
-                      padding: EdgeInsets.only(top: 20),
+                  child: Shimmer.fromColors(
+                    baseColor: AppColor.secondaryColor,
+                    highlightColor: AppColor.secondaryColor.withAlpha(2),
+                    child: Column(
+                      children: List.generate(5, (index) {
+                        return Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: AppColor.primaryColor,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              margin: EdgeInsets.all(16),
+                              height: 40,
+
+                              padding: EdgeInsets.all(7),
+                            ),
+                            if (index < 4) SizedBox(height: 10),
+                          ],
+                        );
+                      }),
                     ),
                   ),
                 );
@@ -131,7 +149,7 @@ class _BuildTile extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.all(15),
         child: Row(
-          spacing: 5,
+          spacing: 10,
           children: [
             GestureDetector(
               onTap: tickOnTap,
