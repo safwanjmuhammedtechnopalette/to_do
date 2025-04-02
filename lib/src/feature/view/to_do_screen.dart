@@ -146,7 +146,7 @@ class _BuildTile extends StatelessWidget {
                         : null,
               ),
             ),
-            Text(task, style: TextStyle(color: Colors.white)),
+            Flexible(child: Text(task, style: TextStyle(color: Colors.white))),
           ],
         ),
       ),
