@@ -22,9 +22,7 @@ class ToDo extends _$ToDo {
   }
 
   Future<bool> addToDo({required String toDo}) async {
-    final isSubmitted = await ref
-        .read(toDoRepositoryProvider)
-        .addTodo(toDo: toDo);
+    final isSubmitted = await _notifier.addTodo(toDo: toDo);
     return isSubmitted;
   }
 
@@ -44,12 +42,10 @@ class ToDo extends _$ToDo {
 
     try {
       // Call API with new status
-      bool success = await ref
-          .read(toDoRepositoryProvider)
-          .upDateToDo(
-            id: id,
-            isCompleted: updatedList[itemIndex].isCompleted ?? false,
-          );
+      bool success = await _notifier.upDateToDo(
+        id: id,
+        isCompleted: updatedList[itemIndex].isCompleted ?? false,
+      );
 
       if (!success) throw Exception('Update failed');
     } catch (e) {
@@ -74,9 +70,7 @@ class ToDo extends _$ToDo {
     mutableList.removeAt(itemIndex);
     update((state) => state.copyWith(toDoList: mutableList));
 
-    final isDeleted = await ref
-        .read(toDoRepositoryProvider)
-        .deleteToDo(id: toDo.id ?? 0);
+    final isDeleted = await _notifier.deleteToDo(id: toDo.id ?? 0);
 
     if (!isDeleted) {
       //  If API fails, reinsert the item
