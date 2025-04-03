@@ -21,7 +21,10 @@ class ToDoRepository implements IToDoRepository {
   @override
   Future<List<ToDoModel>?> getTodo() async {
     try {
-      final response = await _apiService.get(path: Endpoint.getTodo);
+      final response = await _apiService.get(
+        path: Endpoint.getTodo,
+        showLoader: false,
+      );
       if (response.statusCode != 200) return null;
       final data = response.data as List;
       return data.map((e) => ToDoModel.fromJson(e)).toList();

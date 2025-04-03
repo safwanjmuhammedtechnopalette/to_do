@@ -27,7 +27,7 @@ class ToDo extends _$ToDo {
   }
 
   Future<void> updateToDo({required int id}) async {
-    // Find current item and toggle its status in UI immediately (optimistic update)
+    // Find current item and toggle its status in UI immediately.
     List<ToDoModel> updatedList = List.from(state.value?.toDoList ?? []);
     int itemIndex = updatedList.indexWhere((item) => item.id == id);
 

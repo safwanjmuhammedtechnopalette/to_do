@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:to_do/src/constant/app_color.dart';
+import 'package:to_do/src/core/util/loader.dart';
 import 'package:to_do/src/feature/controller/to_do_controller.dart';
+import 'package:to_do/src/feature/data/model/to_do_model.dart';
 import 'package:to_do/src/feature/view/widgets/add_bottom_sheet.dart';
-import 'package:to_do/src/feature/view/widgets/app_text_field.dart';
 import 'package:to_do/src/feature/view/widgets/confirm_sheet.dart';
 import 'package:to_do/src/feature/view/widgets/sliver_app_bar.dart';
 
@@ -24,21 +25,21 @@ class ToDoScreen extends ConsumerWidget {
     await ref.read(toDoProvider.notifier).updateToDo(id: id);
   }
 
-  Future<void> _onRefresh(WidgetRef ref) async {
-    // ignore: unused_result
-    ref.refresh(toDoProvider);
+  Future<void> _onDismissed(WidgetRef ref, {required ToDoModel toDo}) async {
+    await ref.read(toDoProvider.notifier).deleteToDo(toDo: toDo);
   }
+
+  Future<void> _onRefresh(WidgetRef ref) async => ref.refresh(toDoProvider);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncValue = ref.watch(toDoProvider);
-    final controller = ref.read(toDoProvider.notifier);
     return RefreshIndicator.adaptive(
       backgroundColor: AppColor.primaryColor,
       color: Colors.white,
       onRefresh: () => _onRefresh(ref),
       child: Scaffold(
-        backgroundColor: Color(0XFF212121),
+        backgroundColor: AppColor.primaryColor,
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.green,
           child: Icon(Icons.add, color: Colors.white),
@@ -74,9 +75,9 @@ class ToDoScreen extends ConsumerWidget {
                           final isDelete = await ConfirmSheet.show(context);
                           return isDelete;
                         },
-                        onDismissed: (value) async {
-                          await controller.deleteToDo(toDo: toDo);
-                        },
+                        onDismissed:
+                            (value) async =>
+                                await _onDismissed(ref, toDo: toDo),
 
                         ///To do tile
                         child: _BuildTile(
@@ -94,37 +95,46 @@ class ToDoScreen extends ConsumerWidget {
                 );
               },
               loading: () {
-                return SliverToBoxAdapter(
-                  child: Shimmer.fromColors(
-                    baseColor: AppColor.secondaryColor,
-                    highlightColor: AppColor.secondaryColor.withAlpha(2),
-                    child: Column(
-                      children: List.generate(5, (index) {
-                        return Column(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: AppColor.primaryColor,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              margin: EdgeInsets.all(16),
-                              height: 40,
-
-                              padding: EdgeInsets.all(7),
-                            ),
-                            if (index < 4) SizedBox(height: 10),
-                          ],
-                        );
-                      }),
-                    ),
-                  ),
-                );
+                return _Shimmer();
               },
               error: (error, stackTrace) {
-                return SliverToBoxAdapter(child: Text('Oops!'));
+                return SliverFillRemaining(child: Center(child: Text('Oops!')));
               },
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Shimmer extends StatelessWidget {
+  const _Shimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Shimmer.fromColors(
+        baseColor: AppColor.secondaryColor,
+        highlightColor: AppColor.secondaryColor.withAlpha(2),
+        child: Column(
+          children: List.generate(5, (index) {
+            return Column(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColor.primaryColor,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  margin: EdgeInsets.all(16),
+                  height: 40,
+
+                  padding: EdgeInsets.all(7),
+                ),
+                if (index < 4) SizedBox(height: 10),
+              ],
+            );
+          }),
         ),
       ),
     );
