@@ -1,9 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:to_do/src/app.dart';
-
 import 'package:to_do/src/core/api_service/i_api_service.dart';
 import 'package:to_do/src/core/app_config.dart';
 import 'package:to_do/src/core/util/loader.dart';
@@ -43,7 +41,6 @@ class ApiService implements IApiService {
   @override
   Future<Response> get({required String path, bool showLoader = false}) async {
     return await _request(() => dio.get(path), showLoader: showLoader);
-    // return await dio.request(path, options: Options(method: 'GET'));
   }
 
   @override
